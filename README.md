@@ -10,7 +10,12 @@ A Home Assistant dashboard card that shows your shopping list as large, touch-fr
 - Updates live: whatever someone adds or checks off in the Bring! app appears right away.
 - Pictures are remembered on each device, so they show up instantly the next time.
 - Typing suggests recently used items, and re-adding one reuses it instead of creating a duplicate.
-- German and English labels, picked from your Home Assistant language.
+- **8 languages**: German, English, French, Spanish, Italian, Dutch, Portuguese, Polish – picked from your Home Assistant language.
+- **Dark & light themes**: tile colors and image filters adapt automatically.
+- **Category filters**: filter your list by Drinks, Dairy, Fruit & Veg, and more.
+- **Sorting**: alphabetical (A–Z) or default server order.
+- **Quantity badges**: amounts like "2x" or "500g" show as a visible badge on each tile.
+- **Editor preview**: see the card in the visual card picker before adding it.
 
 > Not affiliated with or endorsed by Bring! Labs AG. "Bring!" is a trademark of its owner.
 
@@ -42,14 +47,28 @@ type: custom:bring-icon-card
 entity: todo.home
 ```
 
-| Option      | Default | Description |
-|-------------|---------|-------------|
-| `entity`    | –       | **Required.** Your Bring! list, e.g. `todo.home`. |
-| `title`     | none    | Optional heading above the card. |
-| `columns`   | `4`     | Number of tiles per row. |
-| `recent`    | `12`    | How many recently used items to show. `0` hides the section. |
-| `images`    | `true`  | Set to `false` to show only initials. |
-| `image_url` | Bring! web assets | Picture address with `{key}` as placeholder for the item name. |
+| Option            | Default | Description |
+|-------------------|---------|-------------|
+| `entity`          | –       | **Required.** Your Bring! list, e.g. `todo.home`. |
+| `title`           | none    | Optional heading above the card. |
+| `columns`         | `4`     | Number of tiles per row. |
+| `recent`          | `12`    | How many recently used items to show. `0` hides the section. |
+| `images`          | `true`  | Set to `false` to show only initials. |
+| `show_categories` | `false` | Show category filter chips above the list (Drinks, Dairy, Fruit & Veg, …). |
+| `sort`            | `none`  | Sort order: `none` (server order) or `alpha` (A–Z). |
+| `image_url`       | Bring! web assets | Picture address with `{key}` as placeholder for the item name. |
+
+### Full example
+
+```yaml
+type: custom:bring-icon-card
+entity: todo.zuhause
+title: Einkaufsliste
+columns: 5
+recent: 16
+show_categories: true
+sort: alpha
+```
 
 ### Use it as a pop-up (Bubble Card)
 
@@ -63,26 +82,55 @@ cards:
     icon: mdi:cart-outline
   - type: custom:bring-icon-card
     entity: todo.home
+    show_categories: true
 ```
 
 Open it from anywhere on your dashboard with a link to `#shopping`.
 
 ### Colors
 
-The card follows your theme. You can change the tile colors with these CSS variables (for example with card-mod):
+The card auto-detects your dark or light theme. You can override the tile colors with these CSS variables (for example with card-mod):
 
 | Variable | Used for |
 |----------|----------|
 | `--bic-open-from`, `--bic-open-to` | Gradient of open items |
 | `--bic-open-border` | Border of open items |
+| `--bic-open-text` | Text color on open tiles |
 | `--bic-accent` | Add button and input focus |
-| `--bic-image-filter` | Picture color. Default is white; use `none` for the original dark pictures on light themes |
+| `--bic-image-filter` | Picture color. Dark themes: `brightness(0) invert(1)` (white). Light themes: `none` (original). |
+| `--bic-letter-bg`, `--bic-letter-color` | Fallback initial circle |
+| `--bic-done-bg`, `--bic-done-border` | Done / recently used tiles |
+
+## Categories
+
+When `show_categories: true`, filter chips appear above the item grid. Each chip shows a category and item count. Categories are detected from a built-in mapping of ~250 common grocery items in German and English. Items not recognized show under "Other".
+
+Supported categories: Drinks, Fruit & Veg, Dairy, Meat & Fish, Bread & Bakery, Frozen, Household, Snacks & Sweets, Spices & Sauces, Breakfast, Personal Care, Other.
+
+## Quantity display
+
+If items have a description (Bring! uses this for quantities like "2x", "500g", or "Bio"), it shows as a small badge below the item name on each tile.
 
 ## How the pictures work
 
 Bring! does not offer an official API for its item pictures. The card loads them from the address the Bring! web app uses. Because the picture names don't always match what people type ("Zwiebel" vs. "Zwiebeln", "Sushi Reis" → "Reis"), the card tries plural forms and word parts. Items without a picture show their first letter, just like in the app. Every device remembers which picture belongs to which item, so the search only happens once.
 
 If Bring! changes that address, the pictures disappear and initials are shown instead. The list keeps working.
+
+## Supported languages
+
+| Language | Code |
+|----------|------|
+| Deutsch | `de` |
+| English | `en` |
+| Français | `fr` |
+| Español | `es` |
+| Italiano | `it` |
+| Nederlands | `nl` |
+| Português | `pt` |
+| Polski | `pl` |
+
+The card reads your Home Assistant language setting and picks the closest match. Other languages fall back to English.
 
 ## License
 
