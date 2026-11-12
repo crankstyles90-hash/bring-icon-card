@@ -7,7 +7,7 @@
  * Not affiliated with or endorsed by Bring! Labs AG.
  * License: MIT
  */
-const VERSION = '2.0.0';
+const VERSION = '2.0.1';
 
 /* ══════════ i18n ══════════ */
 
@@ -598,6 +598,11 @@ class BringIconCard extends HTMLElement {
     title.textContent = this._config.title || '';
     title.hidden = !this._config.title;
     this.style.setProperty('--bic-columns', String(this._config.columns));
+    // keep add-field labels in the current language (hass.language may arrive after _build)
+    const inp = $('input');
+    if (inp && inp.placeholder !== t.add) { inp.placeholder = t.add; inp.setAttribute('aria-label', t.add); }
+    const plusBtn = $('.plus');
+    if (plusBtn && plusBtn.getAttribute('aria-label') !== t.addBtn) plusBtn.setAttribute('aria-label', t.addBtn);
     const msg = $('.msg');
     if (!this._items) {
       msg.textContent = t.loading; msg.hidden = false;
